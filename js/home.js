@@ -44,12 +44,12 @@ export function loadHome() {
                                 <h2>Speakers and Presenters</h2>
                             </div>
                             <div class="card-image">
-                                <img src="/images/flex-3.png" alt="Speakers Image" onerror="this.onerror=null; this.src='default-image.png';">
+                                <img src="./images/flex-3.png" alt="Speakers Image" onerror="this.onerror=null; this.src='default-image.png';">
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image">
-                                <img src="/images/flex-4.png" alt="Attendees Image" onerror="this.onerror=null; this.src='default-image.png';">
+                                <img src="./images/flex-4.png" alt="Attendees Image" onerror="this.onerror=null; this.src='default-image.png';">
                             </div>
                             <div class="card-content">
                                 <h1>${general.attendees || '0'}</h1>
@@ -62,12 +62,12 @@ export function loadHome() {
                                 <h2>Countries Represented</h2>
                             </div>
                             <div class="card-image">
-                                <img src="/images/flex-2.jpg" alt="Countries Image" onerror="this.onerror=null; this.src='default-image.png';">
+                                <img src="./images/flex-2.jpg" alt="Countries Image" onerror="this.onerror=null; this.src='default-image.png';">
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-image">
-                                <img src="/images/flex-5.png" alt="Organizations Image" onerror="this.onerror=null; this.src='default-image.png';">
+                                <img src="./images/flex-5.png" alt="Organizations Image" onerror="this.onerror=null; this.src='default-image.png';">
                             </div>
                             <div class="card-content">
                                 <h1>${general.organizations || '0'}</h1>
@@ -124,10 +124,10 @@ export function loadHome() {
 // Helper function for thematic areas
 function generateThemesSection() {
     const themes = [
-        { image: "images/gsac25theme1.jpg", title: "Monitoring WASH and climate", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: "images/gsac25theme2.jpg", title: "Governance for inclusive and climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: "images/gsac25theme3.jpg", title: "Financing climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: "images/gsac25theme4.jpg", title: "WASH innovations in technology and service delivery", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." }
+        { image: ".images/gsac25theme1.jpg", title: "Monitoring WASH and climate", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: ".images/gsac25theme2.jpg", title: "Governance for inclusive and climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: ".images/gsac25theme3.jpg", title: "Financing climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: ".images/gsac25theme4.jpg", title: "WASH innovations in technology and service delivery", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." }
     ];
 
     return themes.map(theme => `
