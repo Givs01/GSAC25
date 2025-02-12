@@ -124,10 +124,10 @@ export function loadHome() {
 // Helper function for thematic areas
 function generateThemesSection() {
     const themes = [
-        { image: ".images/gsac25theme1.jpg", title: "Monitoring WASH and climate", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: ".images/gsac25theme2.jpg", title: "Governance for inclusive and climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: ".images/gsac25theme3.jpg", title: "Financing climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
-        { image: ".images/gsac25theme4.jpg", title: "WASH innovations in technology and service delivery", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." }
+        { image: "images/gsac25theme1.jpg", title: "Monitoring WASH and climate", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: "images/gsac25theme2.jpg", title: "Governance for inclusive and climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: "images/gsac25theme3.jpg", title: "Financing climate resilient WASH", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." },
+        { image: "images/gsac25theme4.jpg", title: "WASH innovations in technology and service delivery", description: "To showcase systems, policies, and strategies for measuring and monitoring WASH outcomes in different countries." }
     ];
 
     return themes.map(theme => `
