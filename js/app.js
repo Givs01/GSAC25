@@ -34,72 +34,50 @@ document.addEventListener("DOMContentLoaded", () => {
     const memoryCache = new Map();
 
     const appendFooter = (htmlContent) => {
-        const footerHTML = `
+        return htmlContent + `
             <br>
             <section class="org">
                 <h3>Organizers</h3>
                 <img src="images/org_logo.jpg" alt="logo" onerror="this.onerror=null; this.src='default-image.png'">
             </section>
         `;
-        return htmlContent + footerHTML;
     };
 
-    const fetchSectionData = (section, displayImmediately = true) => {
+    const fetchSectionData = async (section, displayImmediately = true) => {
         if (memoryCache.has(section)) {
             const cachedData = memoryCache.get(section);
-
             if (displayImmediately) {
                 content.innerHTML = cachedData;
                 hideLoader();
             }
-            return Promise.resolve(cachedData);
+            return cachedData;
         }
 
         showLoader();
 
-        return import(`./${section}.js`)
-            .then((module) => {
-                let data;
+        try {
+            const module = await import(`./${section}.js`);
+            const data = module[`load${capitalizeFirstLetter(section)}`] ? await module[`load${capitalizeFirstLetter(section)}`]() : "";
 
-                switch (section) {
-                    case "home":
-                        data = module.loadHome ? module.loadHome() : "";
-                        break;
-                    case "programme":
-                        data = module.loadProgramme ? module.loadProgramme() : "";
-                        break;
-                    case "speakers":
-                        data = module.loadSpeakers ? module.loadSpeakers() : "";
-                        break;
-                    case "presentations":
-                        data = module.loadPresentations ? module.loadPresentations() : "";
-                        break;
-                    case "venue":
-                        data = module.loadVenue ? module.loadVenue() : "";
-                        break;
-                    default:
-                        data = "";
-                }
+            const contentWithFooter = appendFooter(data);
+            memoryCache.set(section, contentWithFooter);
+            saveToSession(section, contentWithFooter);
 
-                return data;
-            })
-            .then((htmlContent) => {
-                const contentWithFooter = appendFooter(htmlContent);
-                memoryCache.set(section, contentWithFooter);
-                saveToSession(section, contentWithFooter);
-
-                if (displayImmediately) {
-                    content.innerHTML = contentWithFooter;
-                    hideLoader();
-                }
-
-                return contentWithFooter;
-            })
-            .catch((err) => {
-                console.error(err);
-                showError(`Error loading ${section} content: ${err.message}`);
+            if (displayImmediately) {
+                content.innerHTML = contentWithFooter;
                 hideLoader();
-            });
+            }
+
+            return contentWithFooter;
+        } catch (err) {
+            console.error(err);
+            showError(`Error loading ${section} content: ${err.message}`);
+            hideLoader();
+        }
+    };
+
+    const capitalizeFirstLetter = (str) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
     };
 
     const loadSection = (section, refresh = false) => {
@@ -109,9 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!refresh && cachedContent) {
             content.innerHTML = cachedContent;
-            fetchSectionData(section, false);  // Only preload without showing
+            fetchSectionData(section, false);
         } else {
-            fetchSectionData(section, true); // Load the section immediately
+            fetchSectionData(section, true);
         }
 
         createScrollToTopButton();
@@ -132,26 +110,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const preloadSections = () => {
         const sections = ["home", "programme", "speakers", "presentations", "venue"];
-
-        sections.forEach((section) => {
-            fetchSectionData(section, false);  // Preload, but don't display
-        });
+        sections.forEach((section) => fetchSectionData(section, false));
     };
 
     const startPreloadAfterLoad = () => {
-        // Preload other sections after the active section has been shown
-        setTimeout(preloadSections, 5000);  // Start preload after 5 seconds
+        setTimeout(preloadSections, 5000);
     };
 
     const reload = (section) => {
-        // Clear any existing timeout to prevent multiple reloads
         clearTimeout(reloadTimeout);
-
-        // Fetch data and reload after a 5-second delay
         reloadTimeout = setTimeout(() => {
             loadSection(section, true);
             startPreloadAfterLoad();
-        }, 5000);  // Reload after 5 seconds delay
+        }, 5000);
     };
 
     const activeSection = sessionStorage.getItem("activeSection") || "home";
@@ -181,14 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("popstate", (event) => {
         const state = event.state;
-
-        if (state) {
-            if (state.section) {
-                showLoader();
-                loadSection(state.section);
-                setActiveNav(state.section);
-                preloadSections();
-            }
+        if (state && state.section) {
+            showLoader();
+            loadSection(state.section);
+            setActiveNav(state.section);
+            preloadSections();
         } else {
             setActiveNav("home");
             loadSection("home");
@@ -200,9 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.clear();
     });
 
-    // Handling reload logic
     window.addEventListener("reloadSection", () => {
-        reload(activeSection);  // Trigger a reload of the active section
+        reload(activeSection);
     });
 });
 
@@ -226,3 +193,4 @@ function createScrollToTopButton() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 }
+

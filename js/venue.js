@@ -2,11 +2,9 @@ export function loadVenue() {
     const navPanel = `
         <nav id="navigation-header" class="navigation-panel">
             <button class="nav-button" id="nav-conclave" data-target="conclave">
-                <i class="fas fa-map-location"></i>
                 <span>Conclave Layout</span>
             </button>
             <button class="nav-button" id="nav-cept" data-target="cept">
-                <i class="fas fa-map-location"></i>
                 <span>CEPT Layout</span>
             </button>
             <button class="nav-button" id="nav-gmap" data-target="gmap">
@@ -17,16 +15,6 @@ export function loadVenue() {
 
     const htmlContent = `
         ${navPanel}
-
-        <section class="sp">
-            <br>
-            <h2>Layout Plans </h1>
-            <h2>And</h2>
-            <h2>Venue location</h1>
-            <br>
-            <br>
-        </section>
-
 
         <div class="hero">
             <div class="ribbon"> 

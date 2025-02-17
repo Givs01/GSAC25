@@ -100,7 +100,6 @@ header li {
     font-size: 1.2rem;
     font-weight:bolder ;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
     text-align: center;
     color: white;
 }
@@ -348,12 +347,14 @@ main h2 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("images\sp.png"); 
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url('https://raw.githubusercontent.com/Givs01/G/960a194d1955f94e9bd6b9006685887f09252e75/images/sp.png'); 
     background-size: cover;
     background-position: center;
-    filter: blur(0px); 
+    filter: blur(0.5px); 
     z-index: -1; 
 }
+
 
 .sp p {
     font-size: 0.8rem;
@@ -388,12 +389,16 @@ main h2 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("\images\background.png"); 
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(1, 163, 186, 0.7)), url('https://raw.githubusercontent.com/Givs01/G/960a194d1955f94e9bd6b9006685887f09252e75/images/sp.png');
     background-size: cover;
     background-position: center;
-    filter: blur(0px); 
-    z-index: -1; 
+    filter: blur(0.50px);
+    z-index: -1;
 }
+
+
+
+
 
 .bghead p {
     font-size: 0.8rem;
@@ -513,10 +518,36 @@ main h2 {
 /*---------------------------speaker -------------------------------*/
 
 .profcard {
-    margin: 0.3rem;
-    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255);
+    margin: 0 0.5rem 0.5rem ;
+    padding: 0.5rem 0.8rem 0.5rem;
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Regular shadow */
-   
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+.bands {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.bands img {
+    width: 90px;  /* Set image width to 80px */
+    height: 90px; /* Set image height to 80px */
+    align-items: center;
+    object-fit: cover;  /* Ensures the image is cropped around the center */
+    border: 0.5px solid var(--primary-color);
+    border-left: 3.5px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 1px;
+    transition: transform 0.3s ease; /* Smooth image zoom effect */
+}
+.profcard > div {
+    padding: 0px;
+    margin: 3.5px;
+    background-color: #fff;
 }
 
 .profcard h1 {
@@ -526,22 +557,30 @@ main h2 {
 }
 
 .profcard h2 {
-    color: var(--text-color);
+    color: var(--primary-color);
     font-size: 1.2rem;
     margin: 0.5rem 0;
 }
 
 .profcard h3 {
-    color: var(--text-color);
+    color: var(--primary-color);
     font-size: 0.8rem;
     margin: 0.5rem 0;
+}
+.profcard h5 {
+    color: var(--text-color);
+    font-size: 0.5rem;
+    padding: 0px;
+    margin: 0px;
+    font-weight: normal;
+    text-align: left;
+
 }
 
 .profcard p {
     font-size: 0.8rem;
     color: var(--text-color);
-    margin-bottom: 0.5rem 0;
-    text-align: justify;
+    text-align: left;
 }
 
 .profcard .star {
@@ -550,25 +589,8 @@ main h2 {
     font-size: 0.5rem;
 }
 
-.profcard {
-    display: flex;
-    background-color: rgb(255, 255, 255);
-    margin: 0 0.5rem 0.5rem ;
-    padding: 0.5rem 0.8rem 0.5rem;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
-}
 
-.profcard img {
-    width: 80px;  /* Set image width to 80px */
-    height: 80px; /* Set image height to 80px */
-    object-fit: cover;  /* Ensures the image is cropped around the center */
-    border: 0.5px solid var(--primary-color);
-    border-left: 5px solid var(--primary-color);
-    border-radius: 10px;
-    padding: 0;
-    transition: transform 0.3s ease; /* Smooth image zoom effect */
-}
+
 
 /* Hover effect for the .profcard */
 .profcard:hover {
@@ -598,10 +620,10 @@ main h2 {
     padding: 0;
 }
 .content-box-b h3 {
+    color: var(--primary-color);
     margin: 0;
     padding: 0;               
-    font-size: 0.8rem;       
-    color: #333;            
+    font-size: 0.9rem;       
 }
 .content-box-b h4 {
     margin: 0 0 0.5rem 0;               
@@ -614,6 +636,7 @@ main h2 {
     font-size: 0.7rem;         
     color: #555;             
 }
+
 
 .content-box {
     display: flex; 
@@ -672,8 +695,8 @@ hr {
 
 /* Profile image styles */
 .profile img {
-    width: 40%;
-    height: 40%;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     border-radius: 20px;
     margin-top: 20px;
@@ -761,6 +784,7 @@ hr {
 }
 
 .search-section {
+    justify-content: center;
     display: flex;
     margin: 10px;
     padding: 10px;
@@ -974,6 +998,7 @@ hr {
 
 .session-time {
     width: 70px;
+    height: 80%;
     font-weight: bold;
     text-align: center;
     background: #f4f4f4;
@@ -1042,6 +1067,155 @@ iframe {
 #gmap {
     width: 100%;
 }
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Modal Content Animation */
+.modal-content {
+    background: white;
+    max-width: 400px;
+    width: 90%;
+    height: 80%;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    opacity: 0;
+    overflow-y: auto; 
+    justify-items: center;
+    
+}
+
+
+/* When Modal is Active */
+.modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* When Modal Content is Active */
+.modal.active .modal-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Close Button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 20px;
+    height: 20px; /* Add height to ensure the button has a defined size */
+    font-size: 20px;
+    font-weight: bolder;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    display: flex; /* Add Flexbox */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+}
+
+
+/* Modal Body Styles */
+#modal-body {
+    width: 100%;
+    padding: 0px;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the content horizontally */
+    justify-content: flex-start; /* Aligns content to the top */
+    transform: translateY(-30px);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+}
+
+.band {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(141, 141, 141, 0.1);
+    border-radius: 10px;
+    align-items: center;
+}
+.band2 {
+    padding: 20px;
+}
+.band2 p{
+    padding: 0px;
+    margin: 0px;
+}
+
+
+/* Styling for the image inside the modal body */
+.band img {
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    border-right: 10px solid var(--primary-color);
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+/* Header styling inside modal body */
+.band2 h2 {
+    font-size: 1.0rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+/* Paragraphs for speaker details */
+#modal-body p {
+    font-size: 0.8rem;
+    color: #333;
+    line-height: 1.5;
+    text-align: justify; /* This will justify the text */
+}
+
+.band3 {
+    margin-top: 10px;
+    width: 80%;
+    background-color: #f9f9f9; /* Light background for the session */
+    border-radius: 8px; /* Slightly rounded corners */
+    padding: 15px; /* Padding around the content */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+.band3 p {
+    
+    font-size: 16px; /* Adjust font size for readability */
+    color: #333; /* Dark text color for contrast */
+    margin: 0; /* Remove any default margin from the paragraph */
+}
+
+.groupPresenter p {
+    margin: 0;
+    padding: 0;
+    font-size: 0.6rem;
+}
+
+
 
 @media screen and (min-width: 600px) {
     :root{

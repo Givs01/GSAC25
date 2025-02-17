@@ -1,61 +1,3 @@
-function attachProgrammeEventListeners() {
-    document.addEventListener("click", (event) => {
-        const target = event.target;
-
-        // Handle search button click
-        if (target.id === "searchButton") {
-            const searchInput = document.getElementById("searchInput");
-            const searchClose = document.getElementById("searchClose");
-            const allSessions = document.querySelectorAll(".session-card");
-            target.style.display = "none"; // Hide search button
-            searchClose.style.display = "block"; // Show close button
-
-            const query = searchInput.value.toLowerCase().trim();
-
-            allSessions.forEach(session => {
-                const sessionTitle = session.querySelector(".session-title").textContent.toLowerCase();
-                const speakerText = session.querySelector(".session-speakers").textContent.toLowerCase();
-
-                session.style.display = (sessionTitle.includes(query) || speakerText.includes(query)) ? "flex" : "none";
-            });
-        }
-
-        // Handle search close button
-        if (target.id === "searchClose") {
-            document.getElementById("searchInput").value = ""; // Clear search input
-            document.querySelectorAll(".session-card").forEach(session => session.style.display = "flex"); // Show all sessions
-            target.style.display = "none"; // Hide close button
-            document.getElementById("searchButton").style.display = "block"; // Show search button
-        }
-
-        // Handle navigation button clicks
-        if (target.classList.contains("nav-button")) {
-            const day = target.dataset.day;
-            const targetSection = document.getElementById(`day-${day}`);
-            const navButtons = document.querySelectorAll(".nav-button");
-
-            const isActive = target.classList.contains("active");
-
-            navButtons.forEach(btn => btn.classList.remove("active"));
-            document.querySelectorAll(".session-card").forEach(session => session.style.display = "flex");
-
-            if (!isActive) {
-                target.classList.add("active");
-                window.scrollTo({ top: targetSection.offsetTop - 90, behavior: "smooth" });
-            }
-        }
-    });
-
-    // Attach keydown event to handle "Enter" key search
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && document.activeElement.id === "searchInput") {
-            document.getElementById("searchButton").click();
-        }
-    });
-}
-
-
-// Modify loadProgramme to directly call attachProgrammeEventListeners()
 export function loadProgramme() {
     return fetch('https://script.google.com/macros/s/AKfycbxQMY0Yb7VfC9I4ddAb6S1KA6WQ2xTc9xcSVlA0SwXUeOhkkpuO1RyNcVsk_ivoSNFI2w/exec')
         .then(response => {
@@ -79,38 +21,37 @@ export function loadProgramme() {
                 return acc;
             }, {});
 
-            const headerSection = `
-                <section class="sp">
-                    <br>
-                    <h2>Agenda</h2>
-                    <br><br>
-                </section>
-            `;
-
             const daySections = Object.keys(groupedByDay).map(day => {
                 const { date, sessions } = groupedByDay[day];
                 return `
                     <div class="ribbon">
                         <p>
-                            <span class="day-text">Day ${day}</span>
-                            <span class="date-text"> ||  ${date}  ||</span>
+                            <span>Day ${day}</span>
+                            <span> ||  ${date}  ||</span>
                         </p>
                     </div>
                     <div class="day-sessions" id="day-${day}">
-                        ${sessions.map(session => `
-                            <section class="agenda-box" id="session-${session.ID}">
-                                <div class="session-card">
-                                    <div class="session-time">
-                                        <p>${session.Time}</p>
-                                        <p><i class="fas fa-map-marker-alt"></i>${session.Venue}</p>
+                        ${sessions.map(session => {
+                            const speakers = session.Speaker.split('<br>').map(part => part.trim()).join('<br>');
+                            const speakerList = session.Speaker.split('<br>').map(part => {
+                                return part.split(',').map(name => `<span class="speaker-name">${name.trim()}</span>`).join(', ');
+                            }).join('<br>');
+
+                            return `
+                                <section class="agenda-box" id="session-${session.ID}">
+                                    <div class="session-card">
+                                        <div class="session-time">
+                                            <p>${session.Time}</p>
+                                            <p><i class="fas fa-map-marker-alt"></i>${session.Venue}</p>
+                                        </div>
+                                        <div class="session-content">
+                                            <h3 class="session-title">${session.Session}</h3>
+                                            <p class="session-speakers">${speakerList}</p>
+                                        </div>
                                     </div>
-                                    <div class="session-content">
-                                        <h3 class="session-title">${session.Session}</h3>
-                                        <p class="session-speakers"><strong>Speakers:</strong> ${session.Speaker}</p>
-                                    </div>
-                                </div>
-                            </section>
-                        `).join('')}
+                                </section>
+                            `;
+                        }).join('')}
                     </div>
                 `;
             }).join('');
@@ -138,10 +79,11 @@ export function loadProgramme() {
                 </nav>
             `;
 
-            const htmlContent = navPanel + headerSection + searchSection + daySections;
+            const htmlContent = navPanel + searchSection + daySections;
 
-            // Attach event listeners immediately after rendering
-            attachProgrammeEventListeners();
+            setTimeout(() => {
+                attachProgrammeEventListeners();
+            }, 5);
 
             return htmlContent;
         })
@@ -149,4 +91,62 @@ export function loadProgramme() {
             console.error('Error loading programme data:', error);
             return `<div class="error-message">Please reload the page: ${error.message}</div>`;
         });
+}
+
+function attachProgrammeEventListeners() {
+    const searchButton = document.getElementById('searchButton');
+    const searchInput = document.getElementById("searchInput");
+    const allSessions = document.querySelectorAll(".session-card");
+    const searchClose = document.getElementById("searchClose");
+    const navButtons = document.querySelectorAll('.nav-button');
+
+    // Handle search button click
+    searchButton.addEventListener('click', () => {
+        // Hide search button and show close button
+        searchButton.style.display = "none";
+        searchClose.style.display = "block";
+
+        const query = searchInput.value.toLowerCase().trim();
+        if (query) {
+            allSessions.forEach(session => {
+                const sessionTitle = session.querySelector(".session-title").textContent.toLowerCase();
+                const speakerText = session.querySelector(".session-speakers").textContent.toLowerCase();
+                // Show sessions that match the query
+                session.style.display = (sessionTitle.includes(query) || speakerText.includes(query)) ? "flex" : "none";
+            });
+        } else {
+            // Show all sessions if no query is entered
+            allSessions.forEach(session => session.style.display = 'flex');
+        }
+    });
+
+    // Handle Enter key press for search
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            searchButton.click();
+        }
+    });
+
+    // Handle search close button click
+    searchClose.addEventListener('click', () => {
+        searchInput.value = "";
+        searchButton.style.display = 'block';
+        searchClose.style.display = 'none';
+        allSessions.forEach(session => session.style.display = 'flex');
+    });
+
+    // Handle navigation button clicks
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const day = button.dataset.day;
+            const targetSection = document.getElementById(`day-${day}`);
+            
+            // Remove active class from all nav buttons and add to the clicked button
+            navButtons.forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+
+            // Scroll to the relevant day section
+            window.scrollTo({ top: targetSection.offsetTop - 90, behavior: "smooth" });
+        });
+    });
 }

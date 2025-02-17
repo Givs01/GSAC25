@@ -20,7 +20,7 @@ export function loadSpeakers() {
             <section class="search-section" id="searchSection">
                 <input type="text" id="searchInput" placeholder="Search for speakers..." />
                 <button id="searchButton">Search</button>
-                <button id="searchClose">
+                <button style="display:none" id="searchClose">
                     <i class="fas fa-close"></i>
                 </button>
             </section>
@@ -56,16 +56,6 @@ export function loadSpeakers() {
                 </nav>
             `;
             
-            const headerSection = `
-            <section class="sp" id="shs">
-                <br>
-                <h2>Speakers </h1>
-                <h2>And</h2>
-                <h2>Presenters</h1>
-                <br>
-                <br>
-            </section>
-            `;
 
             const speakerGroups = Object.keys(groupedSpeakers).map(category => {
                 const speakersInCategory = groupedSpeakers[category];
@@ -77,13 +67,16 @@ export function loadSpeakers() {
                         <div class="card">
                             ${speakersInCategory.map(speaker => `
                         </div>
-                            <section class="profcard" id="${speaker.ID}" onclick="showProfile('${speaker.ID}')">
-                                <img src="${speaker.FullPath || 'default-image.png'}" alt="${speaker.Name}" onerror="this.onerror=null; this.src='/images/photo.jpg'">
-                                <div class="content-box-b">
-                                    <h3>${speaker.Name}</h3>
-                                    <h4>${speaker.Designation || "Unknown Designation"} | ${speaker.Organization || "Unknown Organization"}</h4>
-                                    <p> <strong> Session:</strong> ${speaker.SessionTitle || "No session title"}</p>
-                                    <p> <strong>Time: </strong>${speaker.Time || "TBA"}  <strong>| Venue:  </strong> ${speaker.Venue || "TBA"}</p>
+                            <section class="profcard" id="${speaker.ID}" onclick="openSpeakerProfile('${speaker.ID}')">
+                                <div class="bands">
+                                    <img src="${speaker.FullPath || 'default-image.png'}" alt="${speaker.Name}" onerror="this.onerror=null; this.src='/images/photo.jpg'">
+                                    <div class="content-box-b">
+                                        <h3>${speaker.Name}</h3>
+                                        <h4 style="font-style: italic; font-weight: normal">${speaker.Designation || "-"}</h4>
+                                        <h4>${speaker.Organization || "-"}</h4>
+                                        <p style ="display:none"> ${speaker.Bio || "No biography available."} </p>
+                                        <h5>${getSessions(speaker.SessionTitle, speaker.Day, speaker.Time, speaker.Venue)} </h5>
+                                    </div>
                                 </div>
                             </section>
                             `).join('')}
@@ -91,14 +84,27 @@ export function loadSpeakers() {
                 `;
             }).join('');
 
-            const htmlContent = navPanel + headerSection  + searchSection + speakerGroups;
-            setTimeout(() => attachEventListeners(), 100);
+            const modalContainer = `
+            <div id="speakerModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <div id="modal-body"></div>
+                </div>
+            </div>
+        `;
+
+            const htmlContent = navPanel +  searchSection + speakerGroups + modalContainer;
+            setTimeout(() => {
+                attachSpeakersEventListeners();
+            }, 5);
+
             return htmlContent;
         })
         .catch(error => {
             return `<div class="error-message">Please reload the page: ${error.message}</div>`;
         });
 }
+
 
 function groupSpeakersByCategory(speakers) {
     const grouped = speakers.reduce((acc, speaker) => {
@@ -122,16 +128,40 @@ function groupSpeakersByCategory(speakers) {
     return sortedGrouped;
 }
 
-function attachEventListeners() {
+function getSessions(sessionTitle, day, time, venue) {
+    const titles = sessionTitle.split(',');
+    const days = day.split(',');
+    const times = time.split(',');
+    const venues = venue.split(',');
+
+    let sessionHtml = '';
+
+    const sessionLabel = titles.length === 1 ? 'Session' : 'Session ${i + 1}';
+
+    for (let i = 0; i < titles.length; i++) {
+        sessionHtml += `
+            <div class="session">
+                ${titles.length === 1 ? 'Session' : `Session ${i + 1}`}: ${titles[i].trim()} | ${days[i]?.trim() || 'TBA'}: ${times[i]?.trim() || 'TBA'} | Venue: ${venues[i]?.trim() || 'TBA'}
+            </div>
+        `;
+    }
+    
+    return sessionHtml;
+}
+
+
+
+function attachSpeakersEventListeners() {
     const searchButton = document.getElementById('searchButton');
     const searchInput = document.getElementById('searchInput');
     const allSpeakers = document.querySelectorAll('.profcard');
     const searchClose = document.getElementById('searchClose');
-    const headerSection = document.getElementById('shs');
     const navButtons = document.querySelectorAll('.nav-button');
     
    
     searchButton.addEventListener('click', () => {
+
+        searchButton.style.display = 'none';
         searchClose.style.display = 'block';
         const query = searchInput.value.toLowerCase().trim();
         if (query) {
@@ -151,8 +181,9 @@ function attachEventListeners() {
     });
 
     searchClose.addEventListener('click', () => {
-        headerSection.style.display = 'flex';
         searchInput.value = "";
+        searchButton.style.display = 'block';
+        searchClose.style.display = 'none';
         allSpeakers.forEach(speaker => speaker.style.display = 'flex');
     });
 
@@ -186,6 +217,62 @@ function attachEventListeners() {
             
         });
     });
-   
 }
 
+window.openSpeakerProfile = function(speakerID) {
+    const speaker = document.getElementById(speakerID);
+    if (!speaker) return;
+
+    const modal = document.getElementById('speakerModal');
+    const modalBody = document.getElementById('modal-body');
+
+
+    modalBody.innerHTML = `
+        <div class="band">
+            <img src="${speaker.querySelector('img').src}" alt="${speaker.querySelector('h3').textContent}" >
+            <div class="band2">
+                <h2>${speaker.querySelector('h3').textContent}</h2>
+                <p style="font-style: italic; font-weight: normal">${speaker.querySelector('h4:nth-of-type(1)').textContent}</p>
+                <p style="font-weight: Bold">${speaker.querySelector('h4:nth-of-type(2)').textContent}</p>
+            </div>
+        </div>
+        <p>${speaker.querySelector('p:nth-of-type(1)').textContent}</p>
+        <div class="ribbon" >Sessions</div>
+        
+        ${speaker.querySelector('h5').textContent.split('Session').map((session, index) => {
+            if (index === 0) {
+                return ''; // Do nothing for the first part (before the first "Session")
+            }
+            return `
+                ${index > 1 ? '<br>' : ''} 
+                <div class="band3">
+                    <p>Session ${session}</p>
+                </div>
+            `;
+        }).join('')}
+        
+        
+        
+    `;
+        
+
+    modal.classList.add('active');
+    modal.style.display = 'block';  // Ensure the modal is visible
+
+    // Add close event listener
+    document.querySelector('.close-button').addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+};
+
+
+function closeModal() {
+    const modal = document.getElementById('speakerModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+}
