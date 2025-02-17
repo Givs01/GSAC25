@@ -17,11 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
     };
 
-    const showError = (message) => {
-        content.innerHTML = `<div class="error-message">${message}</div>`;
-        hideLoader();
-    };
-
     const saveToSession = (key, value) => {
         sessionStorage.setItem(key, JSON.stringify(value));
     };
@@ -71,8 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return contentWithFooter;
         } catch (err) {
             console.error(err);
-            showError(`Error loading ${section} content: ${err.message}`);
-            hideLoader();
+            // If data is not available, keep the loader running
+            if (!memoryCache.has(section)) {
+                showLoader();
+            }
         }
     };
 
@@ -96,7 +93,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const setActiveNav = (section) => {
-        document.querySelector("#navigation-footer button.active")?.classList.remove("active");
+        // Remove 'active' class from the previously active section
+        const previousActiveNavItem = document.querySelector("#navigation-footer button.active");
+        if (previousActiveNavItem) {
+            previousActiveNavItem.classList.remove("active");
+        }
+
+        // Add 'active' class to the new section
         const activeNavItem = document.querySelector(`#navigation-footer button[data-section="${section}"]`);
         if (activeNavItem) {
             activeNavItem.classList.add("active");
@@ -110,7 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const preloadSections = () => {
         const sections = ["home", "programme", "speakers", "presentations", "venue"];
-        sections.forEach((section) => fetchSectionData(section, false));
+        sections.forEach((section) => {
+            fetchSectionData(section, false);  // Prefetch sections
+        });
     };
 
     const startPreloadAfterLoad = () => {
@@ -122,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         reloadTimeout = setTimeout(() => {
             loadSection(section, true);
             startPreloadAfterLoad();
-        }, 5000);
+        }, 1000);
     };
 
     const activeSection = sessionStorage.getItem("activeSection") || "home";
@@ -139,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navItems.forEach((item) => {
         item.addEventListener("click", async () => {
             const section = item.getAttribute("data-section");
-            setActiveNav(section);
+            setActiveNav(section);  // Remove active class from previous and add to new section
             showLoader();
 
             await loadSection(section);
@@ -171,26 +176,26 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("reloadSection", () => {
         reload(activeSection);
     });
+
+    // Create "scroll to top" button
+    function createScrollToTopButton() {
+        if (document.getElementById("scrollToTop")) return;
+    
+        const scrollButton = document.createElement("button");
+        scrollButton.id = "scrollToTop";
+        scrollButton.innerHTML = '<i class="fa fa-circle-chevron-up"></i>';
+        document.body.appendChild(scrollButton);
+    
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 200) {
+                scrollButton.classList.add("visible");
+            } else {
+                scrollButton.classList.remove("visible");
+            }
+        });
+    
+        scrollButton.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
 });
-
-function createScrollToTopButton() {
-    if (document.getElementById("scrollToTop")) return;
-
-    const scrollButton = document.createElement("button");
-    scrollButton.id = "scrollToTop";
-    scrollButton.innerHTML = '<i class="fa fa-circle-chevron-up"></i>';
-    document.body.appendChild(scrollButton);
-
-    window.addEventListener("scroll", () => {
-        if (window.scrollY > 200) {
-            scrollButton.classList.add("visible");
-        } else {
-            scrollButton.classList.remove("visible");
-        }
-    });
-
-    scrollButton.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-}
-

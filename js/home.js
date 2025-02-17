@@ -52,7 +52,7 @@ export function loadHome() {
                                 <img src="./images/flex-4.png" alt="Attendees Image" onerror="this.onerror=null; this.src='default-image.png';">
                             </div>
                             <div class="card-content">
-                                <h1>${general.attendees || '0'}</h1>
+                                <h1>${general.registrations || '0'}</h1>
                                 <h2>Attendees</h2>
                             </div>
                         </div>

@@ -32,14 +32,14 @@ export function loadProgramme() {
                     </div>
                     <div class="day-sessions" id="day-${day}">
                         ${sessions.map(session => {
-                            const speakers = session.Speaker.split('<br>').map(part => part.trim()).join('<br>');
-                            const speakerList = session.Speaker.split('<br>').map(part => {
-                                return part.split(',').map(name => `<span class="speaker-name">${name.trim()}</span>`).join(', ');
-                            }).join('<br>');
+                            const speakerList = session.Speaker.split('<br>').map(part =>
+                                part.split(',').map(name =>
+                                    `<span class="speaker-name">${name.trim()}</span>`).join(', ')
+                            ).join('<br>');
 
                             return `
                                 <section class="agenda-box" id="session-${session.ID}">
-                                    <div class="session-card">
+                                    <div class="session-card" id="${session.Class}">
                                         <div class="session-time">
                                             <p>${session.Time}</p>
                                             <p><i class="fas fa-map-marker-alt"></i>${session.Venue}</p>
@@ -67,7 +67,7 @@ export function loadProgramme() {
             `;
 
             const navButtons = Object.keys(groupedByDay).map(day => `
-                <button class="nav-button" id="nav-${day}" data-day="${day}">
+                <button class="nav-button" data-day="${day}">
                     <i class="fa fa-calendar"></i>
                     <span>Day ${day}</span>
                 </button>
@@ -79,13 +79,7 @@ export function loadProgramme() {
                 </nav>
             `;
 
-            const htmlContent = navPanel + searchSection + daySections;
-
-            setTimeout(() => {
-                attachProgrammeEventListeners();
-            }, 5);
-
-            return htmlContent;
+            return navPanel + searchSection + daySections;
         })
         .catch(error => {
             console.error('Error loading programme data:', error);
@@ -93,60 +87,59 @@ export function loadProgramme() {
         });
 }
 
-function attachProgrammeEventListeners() {
-    const searchButton = document.getElementById('searchButton');
-    const searchInput = document.getElementById("searchInput");
-    const allSessions = document.querySelectorAll(".session-card");
-    const searchClose = document.getElementById("searchClose");
-    const navButtons = document.querySelectorAll('.nav-button');
+// Global Event Delegation for Programme Navigation & Search
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('.nav-button');
+    const searchButton = event.target.closest('#searchButton');
+    const searchClose = event.target.closest('#searchClose');
 
-    // Handle search button click
-    searchButton.addEventListener('click', () => {
-        // Hide search button and show close button
-        searchButton.style.display = "none";
-        searchClose.style.display = "block";
+    if (button) {
+        // Handle day navigation
+        const targetDay = button.getAttribute('data-day');
+        const targetSection = document.getElementById(`day-${targetDay}`);
 
+        if (targetSection) {
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+
+            setTimeout(() => {
+                window.scrollTo({
+                    top: targetSection.offsetTop - 90,
+                    behavior: "smooth"
+                });
+            }, 100);
+        }
+    } else if (searchButton) {
+        // Handle search functionality
+        const searchInput = document.getElementById("searchInput");
+        const allSessions = document.querySelectorAll(".session-card");
         const query = searchInput.value.toLowerCase().trim();
+
         if (query) {
             allSessions.forEach(session => {
                 const sessionTitle = session.querySelector(".session-title").textContent.toLowerCase();
                 const speakerText = session.querySelector(".session-speakers").textContent.toLowerCase();
-                // Show sessions that match the query
                 session.style.display = (sessionTitle.includes(query) || speakerText.includes(query)) ? "flex" : "none";
             });
+
+            document.getElementById("searchButton").style.display = "none";
+            document.getElementById("searchClose").style.display = "block";
         } else {
-            // Show all sessions if no query is entered
             allSessions.forEach(session => session.style.display = 'flex');
         }
-    });
+    } else if (searchClose) {
+        // Handle closing search
+        document.getElementById("searchInput").value = "";
+        document.getElementById("searchButton").style.display = "block";
+        document.getElementById("searchClose").style.display = "none";
 
-    // Handle Enter key press for search
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchButton.click();
-        }
-    });
+        document.querySelectorAll(".session-card").forEach(session => session.style.display = 'flex');
+    }
+});
 
-    // Handle search close button click
-    searchClose.addEventListener('click', () => {
-        searchInput.value = "";
-        searchButton.style.display = 'block';
-        searchClose.style.display = 'none';
-        allSessions.forEach(session => session.style.display = 'flex');
-    });
-
-    // Handle navigation button clicks
-    navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const day = button.dataset.day;
-            const targetSection = document.getElementById(`day-${day}`);
-            
-            // Remove active class from all nav buttons and add to the clicked button
-            navButtons.forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
-
-            // Scroll to the relevant day section
-            window.scrollTo({ top: targetSection.offsetTop - 90, behavior: "smooth" });
-        });
-    });
-}
+// Handle Enter key press for search input
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && document.activeElement.id === 'searchInput') {
+        document.getElementById('searchButton').click();
+    }
+});

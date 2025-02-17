@@ -93,12 +93,7 @@ export function loadSpeakers() {
             </div>
         `;
 
-            const htmlContent = navPanel +  searchSection + speakerGroups + modalContainer;
-            setTimeout(() => {
-                attachSpeakersEventListeners();
-            }, 5);
-
-            return htmlContent;
+            return navPanel +  searchSection + speakerGroups + modalContainer;
         })
         .catch(error => {
             return `<div class="error-message">Please reload the page: ${error.message}</div>`;
@@ -151,73 +146,59 @@ function getSessions(sessionTitle, day, time, venue) {
 
 
 
-function attachSpeakersEventListeners() {
-    const searchButton = document.getElementById('searchButton');
-    const searchInput = document.getElementById('searchInput');
-    const allSpeakers = document.querySelectorAll('.profcard');
-    const searchClose = document.getElementById('searchClose');
-    const navButtons = document.querySelectorAll('.nav-button');
-    
-   
-    searchButton.addEventListener('click', () => {
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('.nav-button');
+    const searchButton = event.target.closest('#searchButton');
+    const searchClose = event.target.closest('#searchClose');
+    const speakerCard = event.target.closest('.profcard');
 
-        searchButton.style.display = 'none';
-        searchClose.style.display = 'block';
+    if (button) {
+        document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const targetCategory = button.getAttribute('data-category');
+        const targetSection = document.getElementById(`category-${targetCategory}`);
+        if (targetSection) {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: targetSection.offsetTop - 90,
+                    behavior: "smooth"
+                });
+            }, 100);
+        }
+    } else if (searchButton) {
+        const searchInput = document.getElementById("searchInput");
+        const allSpeakers = document.querySelectorAll(".profcard");
         const query = searchInput.value.toLowerCase().trim();
+
         if (query) {
             allSpeakers.forEach(speaker => {
-                const speakerName = speaker.querySelector('h3').textContent.toLowerCase();
-                speaker.style.display = speakerName.includes(query) ? 'flex' : 'none';
+                const speakerName = speaker.querySelector("h3").textContent.toLowerCase();
+                speaker.style.display = speakerName.includes(query) ? "flex" : "none";
             });
+
+            document.getElementById("searchButton").style.display = "none";
+            document.getElementById("searchClose").style.display = "block";
         } else {
             allSpeakers.forEach(speaker => speaker.style.display = 'flex');
         }
-    });
+    } else if (searchClose) {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("searchButton").style.display = "block";
+        document.getElementById("searchClose").style.display = "none";
+        document.querySelectorAll(".profcard").forEach(speaker => speaker.style.display = 'flex');
+    } else if (speakerCard) {
+        openSpeakerProfile(speakerCard.id);
+    }
+});
 
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchButton.click();
-        }
-    });
+// Handle Enter key press for search input
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && document.activeElement.id === 'searchInput') {
+        document.getElementById('searchButton').click();
+    }
+});
 
-    searchClose.addEventListener('click', () => {
-        searchInput.value = "";
-        searchButton.style.display = 'block';
-        searchClose.style.display = 'none';
-        allSpeakers.forEach(speaker => speaker.style.display = 'flex');
-    });
-
-    // Add event listener for the nav buttons (toggle active state and reset if clicked again)
-    navButtons.forEach(button => {
-        const category = button.dataset.category;
-        const categoryId = `category-${category}`;
-
-        button.addEventListener('click', () => {
-            const isActive = button.classList.contains('active');
-
-            navButtons.forEach(btn => btn.classList.remove('active'));
-
-            allSpeakers.forEach(speaker => {
-                speaker.style.display = 'flex';
-            });
-
-            if (isActive) {
-                return;
-            }
-
-            button.classList.add('active');
-
-            const targetSection = document.getElementById(categoryId);
-            
-            if (targetSection) {
-                const offset = 60;
-                const targetPosition = targetSection.getBoundingClientRect().top + window.scrollY - offset;
-                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-            }
-            
-        });
-    });
-}
 
 window.openSpeakerProfile = function(speakerID) {
     const speaker = document.getElementById(speakerID);
