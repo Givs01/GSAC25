@@ -33,10 +33,7 @@ export function loadHome() {
                     <p>${general.description1 || ''}</p>
                     <p>${general.description2 || ''}</p>
                     <p>${general.description3 || ''}</p>
-                    <p class="star">
-                        # All the numbers are based on our past GSAC conference
-                    </p>
-                    
+                  
                     <div class="card-container">
                         <div class="card">
                             <div class="card-content">
