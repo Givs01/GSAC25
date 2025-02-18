@@ -80,7 +80,7 @@ export function loadPresentations() {
                         <div class="day-sessions">
                             ${groupedByCategory[category][day][theme].map(presentation => `
                                 <section class="agenda-box" id="presentation-${presentation['Sr.No.']}">
-                                    <div class="session-card" data-pdf="https://cwas.org.in/resources/file_manager/urban_water___sanitation_in_gujarat_analysis_report_2009-2016.pdf#page=${presentation.PageNumber}">
+                                    <div class="session-card" data-pdf="#page=${presentation.PageNumber}">
                                         <div class="session-time">
                                             <p>${presentation.Time}</p>
                                             <p><i class="fas fa-map-marker-alt"></i>${presentation.Venue}</p>
