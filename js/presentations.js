@@ -1,3 +1,36 @@
+function createPdfModal() {
+    if (document.getElementById("modelpdf")) return; // Prevent duplicate modals
+
+    const modal = document.createElement("div");
+    modal.id = "modelpdf";
+    modal.style.display = "none";
+    modal.innerHTML = `
+        <div class="modal-contentp">
+            <span class="close-modalp">&times;</span>
+            <iframe id="pdfViewer" src="" frameborder="0" max-width="600px" height="400px"></iframe>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Close modal on click of close button
+    modal.querySelector(".close-modalp").addEventListener("click", () => {
+        modal.style.display = "none";
+        document.getElementById("pdfViewer").src = ""; // Clear PDF on close
+    });
+
+    // Close modal when clicking outside the modal content
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+            document.getElementById("pdfViewer").src = "";
+        }
+    });
+}
+
+// Call function to ensure the modal is in the DOM
+createPdfModal();
+
+
 export function loadPresentations() {
     return fetch('https://script.google.com/macros/s/AKfycbyLMcMgwDrJqJp52E-_Bn3lNvJKH-CceF8_WwYvw4uPj8j2W6hrUlIgLMiHsQVPRSxC2w/exec')
         .then(response => {
@@ -32,52 +65,41 @@ export function loadPresentations() {
                 groupedByCategory[category][day][theme].push(presentation);
             });
 
-            const presentationsSections = Object.keys(groupedByCategory).map(category => {
-                const categorySection = Object.keys(groupedByCategory[category]).map(day => {
-                    const daySection = Object.keys(groupedByCategory[category][day]).map(theme => {
-                        const themeList = groupedByCategory[category][day][theme];
-                        return `
-                            <div class="ribbon3">
-                                <p>${theme}</p>
-                            </div>
-                            <div class="day-sessions" id="category-${category.replace(/\s+/g, '-')}-day-${day}-theme-${theme.replace(/\s+/g, '-')}">
-                                ${themeList.map(presentation => {
-                                    return `
-                                        <section class="agenda-box" id="presentation-${presentation['Sr.No.']}">
-                                            <div class="session-card">
-                                                <div class="session-time">
-                                                    <p>${presentation.Time}</p>
-                                                    <p><i class="fas fa-map-marker-alt"></i>${presentation.Venue}</p>
-                                                </div>
-                                                <div class="session-content">
-                                                    <h3 class="session-title">${presentation['Poster Name']}</h3>
-                                                    <div class="groupPresenter">
-                                                        <p><strong>Author:</strong> ${presentation['Author Name']}</p>
-                                                        <p><strong>Co-Authors:</strong> ${presentation['CoAuthor']}</p>
-                                                        <p><strong>Organization:</strong> ${presentation['Organization']}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-                                    `;
-                                }).join('')}
-                            </div>
-                        `;
-                    }).join('');
-                    return `
-                        <div class="ribbon2">
-                            <p>${day}</p>
-                        </div>
-                        ${daySection}
-                    `;
-                }).join('');
-                return `
-                    <div class="ribbon" id="category-${category.replace(/\s+/g, '-')}">
-                        <p>${category}</p>
+            const presentationsSections = Object.keys(groupedByCategory).map(category => `
+                <div class="ribbon" id="category-${category.replace(/\s+/g, '-')}">
+                    <p>${category}</p>
+                </div>
+                ${Object.keys(groupedByCategory[category]).map(day => `
+                    <div class="ribbon2">
+                        <p>${day}</p>
                     </div>
-                    ${categorySection}
-                `;
-            }).join('');
+                    ${Object.keys(groupedByCategory[category][day]).map(theme => `
+                        <div class="ribbon3">
+                            <p>${theme}</p>
+                        </div>
+                        <div class="day-sessions">
+                            ${groupedByCategory[category][day][theme].map(presentation => `
+                                <section class="agenda-box" id="presentation-${presentation['Sr.No.']}">
+                                    <div class="session-card" data-pdf="https://cwas.org.in/resources/file_manager/urban_water___sanitation_in_gujarat_analysis_report_2009-2016.pdf#page=${presentation.PageNumber}">
+                                        <div class="session-time">
+                                            <p>${presentation.Time}</p>
+                                            <p><i class="fas fa-map-marker-alt"></i>${presentation.Venue}</p>
+                                        </div>
+                                        <div class="session-content">
+                                            <h3 class="session-title">${presentation['Poster Name']}</h3>
+                                            <div class="groupPresenter">
+                                                <p><strong>Author:</strong> ${presentation['Author Name']}</p>
+                                                <p><strong>Co-Authors:</strong> ${presentation['CoAuthor']}</p>
+                                                <p><strong>Organization:</strong> ${presentation['Organization']}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                `).join('')}
+            `).join('');
 
             const searchSection = `
                 <section class="search-section" id="searchSection">
@@ -153,5 +175,28 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && document.activeElement.id === 'searchInput') {
         document.getElementById('searchButton').click();
+    }
+});
+
+
+document.addEventListener("click", (event) => {
+    const sessionCard = event.target.closest(".session-card");
+    if (sessionCard) {
+        const pdfUrl = sessionCard.getAttribute("data-pdf");
+        console.log("PDF URL:", pdfUrl); // Debugging
+
+        if (pdfUrl) {
+            const modal = document.getElementById("modelpdf");
+            const pdfViewer = document.getElementById("pdfViewer");
+
+            if (modal && pdfViewer) {
+                pdfViewer.src = pdfUrl; // Set PDF source
+                modal.style.display = "flex"; // Show modal
+            } else {
+                console.error("Modal or PDF Viewer not found!");
+            }
+        } else {
+            alert("No PDF available for this presentation.");
+        }
     }
 });
