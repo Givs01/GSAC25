@@ -189,33 +189,30 @@ i {
 
 /* List items inside update */
 .update li {
+    width: 100%;
     font-size: 0.8rem;
     margin-bottom: 12px;
     color: #555;
     opacity: 0; /* Start with items hidden */
-    animation: fadeInSwap 1s forwards 5s infinite, blink 0.75s step-end infinite; 
+    animation: fadeInOut 2s ease-in-out infinite;
 }
 
-/* Fade-in swap animation */
-@keyframes fadeInSwap {
+/* Smooth fade-in and fade-out effect */
+@keyframes fadeInOut {
     0% {
-        opacity: 0;
-        transform: translateX(20px); /* Start below the original position */
+        opacity: 1;
+    }
+    25% {
+        opacity: 1; /* Fade in */
     }
     50% {
-        opacity: 1;
-        transform: translateX(0); /* End in the original position */
+        opacity: 1; /* Hold fully visible */
+    }
+    75% {
+        opacity: 1; /* Fade out */
     }
     100% {
         opacity: 0;
-        transform: translateX(-20px); /* Fade out and slide upwards */
-    }
-}
-
-/* Cursor blink effect */
-@keyframes blink {
-    50% {
-        border-color: transparent;
     }
 }
 

@@ -102,6 +102,15 @@ export function loadSpeakers() {
 
 
 function groupSpeakersByCategory(speakers) {
+    const customCategoryOrder = [
+        "Keynote Speaker",
+        "Inaugural",
+        "Panelist", 
+        "Verbal Presenter", 
+        "Poster Presenter", 
+    ];
+
+    // Group speakers by category
     const grouped = speakers.reduce((acc, speaker) => {
         const category = speaker.ParticipantCatagory || 'Other';
         if (!acc[category]) {
@@ -111,17 +120,35 @@ function groupSpeakersByCategory(speakers) {
         return acc;
     }, {});
 
-    const categories = Object.keys(grouped);
-    const sortedCategories = categories.filter(category => category !== 'Other').sort((a, b) => a.localeCompare(b));
-    sortedCategories.push('Other');
+    // Get all unique categories and combine custom ones with others
+    const groupedCategories = Object.keys(grouped);
+    
+    // Sort predefined categories first
+    const sortedCategories = customCategoryOrder.concat(
+        groupedCategories.filter(category => !customCategoryOrder.includes(category))
+            .sort() // Sort any new categories alphabetically
+    );
 
     const sortedGrouped = sortedCategories.reduce((acc, category) => {
-        grouped[category]?.sort((a, b) => a.Name.localeCompare(b.Name));
+        // Sort speakers in the category by serial number first, then alphabetically
+        grouped[category]?.sort((a, b) => {
+            const serialA = a.SerialNumber ? parseInt(a.SerialNumber, 10) : Infinity; // Fallback to Infinity if SerialNumber is not available
+            const serialB = b.SerialNumber ? parseInt(b.SerialNumber, 10) : Infinity; // Same for b
+
+            if (serialA !== serialB) {
+                return serialA - serialB; // Sort by serial number if both exist
+            } else {
+                return a.Name.localeCompare(b.Name); // If serial numbers are the same or missing, fallback to alphabetically
+            }
+        });
+
         acc[category] = grouped[category] || [];
         return acc;
     }, {});
+
     return sortedGrouped;
 }
+
 
 function getSessions(sessionTitle, day, time, venue) {
     const titles = sessionTitle.split(',');
