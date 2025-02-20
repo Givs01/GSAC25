@@ -106,7 +106,7 @@ export function loadHome() {
                         </p>
                     </div>
                     <p style="margin-top:5px;">
-                        CWAS has been working on urban water and sanitation related action research since 2009. CWAS began its work when CEPT University received a grant from the Gates Foundation for Performance Assessment System (PAS) Project. Over the past decade, the project has developed an online system, methods, and processes for performance assessment and improvement for urban water supply and sanitation in India. In 2009, this system was initiated in 400 cities in two states of India. Today it is used by 1000+ Indian cities in four states of India. It is one of the largest Urban Water and Sanitation database in India and is used by various governments and institutions.
+                        CWAS has been working on urban water and sanitation related action research since 2009. CWAS began its work when CEPT University received a grant from the Gates Foundation for Performance Assessment System (PAS) Project. Over the past decade, the project has developed an online system, methods, and processes for performance assessment and improvement for urban water supply and sanitation in India. In 2009, this system was initiated in 400+ cities in two states of India. Over these years, the PAS system has been used by 900+ Indian cities across six states and SMART cities. PAS system has the repository of 1800+ cities and it is one of the largest Urban Water and Sanitation database in India which is used by various governments and institutions.
                     </p>
                 </section>
             `;
