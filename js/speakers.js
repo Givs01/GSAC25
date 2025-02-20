@@ -105,7 +105,8 @@ function groupSpeakersByCategory(speakers) {
     const customCategoryOrder = [
         "Keynote Speaker",
         "Inaugural",
-        "Panelist", 
+        "Panelist",
+        "Chair",
         "Verbal Presenter", 
         "Poster Presenter", 
     ];
